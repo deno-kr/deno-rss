@@ -15,7 +15,11 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: vx.x.x
-      - name: "[Fetch]RSS Feed"
+      - name: "[Fetch] RSS Feed"
+        env:
+          BOT_ID: ${{ secrets.BOT_ID }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEn }}
+          CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
         run: |
           deno task run
       - name: "[WRAPUP] Write Current Time"
