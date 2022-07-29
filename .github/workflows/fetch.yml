@@ -19,7 +19,7 @@ jobs:
       - name: "[Fetch] RSS Feed"
         env:
           BOT_ID: ${{ secrets.BOT_ID }}
-          BOT_TOKEN: ${{ secrets.BOT_TOKEn }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
           RSS_LINK: "https://buttondown.email/denonews/rss"
         run: |
