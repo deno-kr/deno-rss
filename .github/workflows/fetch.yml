@@ -1,3 +1,4 @@
+name: "Fetch RSS"
 on:
   schedule:
     - cron: "*/5 * * * *"
