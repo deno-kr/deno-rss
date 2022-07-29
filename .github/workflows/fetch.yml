@@ -20,6 +20,7 @@ jobs:
           BOT_ID: ${{ secrets.BOT_ID }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEn }}
           CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
+          RSS_LINK: "https://buttondown.email/denonews/rss"
         run: |
           deno task run
       - name: "[WRAPUP] Write Current Time"
