@@ -16,6 +16,13 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: vx.x.x
+      - name: "[SETUP] Dep Cache"
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.deno
+            ~/.cache/deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deps.ts') }}
       - name: "[Fetch] RSS Feed"
         env:
           BOT_ID: ${{ secrets.BOT_ID }}
