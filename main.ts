@@ -13,6 +13,7 @@ const lastPublishedText = (await Deno.readTextFile("./last_published.txt")).trim
 const lastPublished = new Date(lastPublishedText);
 
 const newEntries = entries.filter((it) => it.published !== undefined && it.published > lastPublished);
+console.log(newEntries);
 const embeds: Embed[] = newEntries.map((it) => ({
   title: it.title?.value,
   description: textClipper(
