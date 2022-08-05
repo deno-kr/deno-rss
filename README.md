@@ -10,3 +10,8 @@
 ### Target RSS
 
 1. Update `RSS_LINK` env to target rss link in fetch workflow.
+
+## How to contribute
+
+Code changes occurs in `dev` branch.
+`bot` branch is store for `last_published.txt`.
