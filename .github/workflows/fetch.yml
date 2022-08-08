@@ -8,10 +8,8 @@ jobs:
   fetch:
     runs-on: ubuntu-latest
     steps:
-      - name: "[SETUP] Checkout"
+      - name: "[SETUP] Checkout Dev"
         uses: actions/checkout@v3
-        with:
-          ref: bot
       - name: "[SETUP] Deno"
         uses: denoland/setup-deno@v1
         with:
@@ -31,6 +29,10 @@ jobs:
           RSS_LINK: "https://buttondown.email/denonews/rss"
         run: |
           deno task run
+      - name: "[SETUP] Checkout"
+        uses: actions/checkout@v3
+        with:
+          ref: bot
       - name: "[WRAPUP] Write Current Time"
         run: |
           git config user.name "Deno RSS Bot"
