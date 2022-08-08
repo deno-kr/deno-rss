@@ -14,4 +14,4 @@
 ## How to contribute
 
 Code changes occurs in `dev` branch.
-`bot` branch is store for `last_published.txt`.
+`bot` branch stores `last_published.txt`.
