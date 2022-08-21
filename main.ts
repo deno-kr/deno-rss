@@ -45,7 +45,9 @@ try {
     )
   }
 } catch (e) {
-  console.error(xml);
-  console.error(e);
+  console.error(JSON.stringify({
+    errorMessage: e.message,
+    xml,
+  }));
   Deno.exit(1);
 }
