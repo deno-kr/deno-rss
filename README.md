@@ -9,7 +9,7 @@
 
 ### Target RSS
 
-1. Update `RSS_LINK` env to target rss link in fetch workflow.
+1. Update `RSS_LINKS` env to target rss link in fetch workflow.
 
 ## How to contribute
 
