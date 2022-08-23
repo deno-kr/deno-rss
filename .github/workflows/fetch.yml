@@ -28,7 +28,7 @@ jobs:
           BOT_ID: ${{ secrets.BOT_ID }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
-          RSS_LINKS: '["https://buttondown.email/denonews/rss"]'
+          RSS_LINKS: '["https://buttondown.email/denonews/rss", "https://deno.com/feed"]'
         run: |
           deno run -A --unstable https://raw.githubusercontent.com/${{ github.repository }}/dev/main.ts
       - name: "[WRAPUP] Write Current Time"
