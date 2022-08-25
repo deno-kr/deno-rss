@@ -10,15 +10,15 @@ const channelId = BigInt(Deno.env.get("CHANNEL_ID") ?? "");
 
 const linksRaw = Deno.env.get("RSS_LINKS") ?? "";
 
+const lastPublishedText = (await Deno.readTextFile("./last_published.txt")).trim();
+const lastPublished = new Date(lastPublishedText);
+
+console.log(`lastPublished: ${lastPublished}`);
+
 const links = JSON.parse(linksRaw);
 links.map(async (link: string) => {
   const response = await fetch(link);
   const xml = await response.text();
-
-  const lastPublishedText = (await Deno.readTextFile("./last_published.txt")).trim();
-  const lastPublished = new Date(lastPublishedText);
-
-  console.log(`lastPublished: ${lastPublished}`);
 
   try {
     const { entries } = await parseFeed(xml);
