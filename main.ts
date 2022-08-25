@@ -15,11 +15,13 @@ links.map(async (link: string) => {
   const response = await fetch(link);
   const xml = await response.text();
 
+  const lastPublishedText = (await Deno.readTextFile("./last_published.txt")).trim();
+  const lastPublished = new Date(lastPublishedText);
+
+  console.log(`lastPublished: ${lastPublished}`);
+
   try {
     const { entries } = await parseFeed(xml);
-
-    const lastPublishedText = (await Deno.readTextFile("./last_published.txt")).trim();
-    const lastPublished = new Date(lastPublishedText);
 
     const newEntries = entries.filter((it) => it.published !== undefined && it.published > lastPublished);
     console.log(newEntries);
