@@ -38,7 +38,7 @@ jobs:
 
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git add last_published.yaml
-          git commit -m "bot:last_published.yaml updated"
+          git commit -m "bot:last_published.yaml updated" --allow-empty
           git push
 
 
