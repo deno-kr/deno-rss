@@ -15,11 +15,17 @@ const botId = BigInt(Deno.env.get("BOT_ID") ?? "");
 const channelId = BigInt(Deno.env.get("CHANNEL_ID") ?? "");
 
 const linksRaw = Deno.env.get("RSS_LINKS") ?? "";
-const lastPublishedFilePath = "./last_published.yaml"
-const lastPublishedFile = await Deno.open(lastPublishedFilePath, { read: true, write: true, create: true })
+const lastPublishedFilePath = "./last_published.yaml";
+const lastPublishedFile = await Deno.open(lastPublishedFilePath, {
+  read: true,
+  write: true,
+  create: true,
+});
 lastPublishedFile.close();
 
-const lastPublishedRaw = parse((await Deno.readTextFile(lastPublishedFilePath)).trim() ?? '') as (Record<string, Date> | undefined) ?? {};
+const lastPublishedRaw = parse(
+  (await Deno.readTextFile(lastPublishedFilePath)).trim() ?? "",
+) as (Record<string, Date> | undefined) ?? {};
 
 const fetchRSS = async (target: string): Promise<FeedEntry[]> => {
   const response = await fetch(target);
@@ -35,7 +41,7 @@ const fetchRSS = async (target: string): Promise<FeedEntry[]> => {
     }));
     Deno.exit(1);
   }
-}
+};
 
 console.log(`lastPublishedRaw: ${JSON.stringify(lastPublishedRaw)}`);
 
@@ -46,27 +52,30 @@ const promises = links.map(async (link) => {
   console.log(`${link}: ${lastPublishedForLink.toISOString()}`);
 
   const [entriesToPublish, newLastPublished]: [FeedEntry[], Date] = entries
-    .filter((it) => 
+    .filter((it) =>
       it.published !== undefined && it.published > lastPublishedForLink
     )
     .reduce(
-      (acc, it) => [acc[0].concat(it), acc[1] > it.published! ? acc[1] : it.published!],
+      (
+        acc,
+        it,
+      ) => [acc[0].concat(it), acc[1] > it.published! ? acc[1] : it.published!],
       [new Array<FeedEntry>(), lastPublishedForLink],
     );
-  
+
   console.log(`entriesToPublish: ${entriesToPublish}`);
 
-   const embeds: Embed[] = entriesToPublish
+  const embeds: Embed[] = entriesToPublish
     .map((it) => ({
-        title: it.title?.value,
-        description: textClipper(
-          unescape(it.description?.value ?? '')
-            .replace(/<[^>]*>/g, "")
-          , 100,
-          { html: false, indicator: '...' },
-        ),
-        url: it.links[0].href,
-      }));
+      title: it.title?.value,
+      description: textClipper(
+        unescape(it.description?.value ?? "")
+          .replace(/<[^>]*>/g, ""),
+        100,
+        { html: false, indicator: "..." },
+      ),
+      url: it.links[0].href,
+    }));
 
   if (embeds.length > 0) {
     const bot = discordeno.createBot({
@@ -78,14 +87,14 @@ const promises = links.map(async (link) => {
       channelId,
       {
         embeds,
-      }
+      },
     );
   }
 
   lastPublishedRaw[link] = newLastPublished;
 });
 
-await Promise.all(promises)
+await Promise.all(promises);
 
 console.log(`newLastPublishedRaw: ${JSON.stringify(lastPublishedRaw)}`);
 
