@@ -36,12 +36,9 @@ jobs:
           git config user.name "Deno RSS Bot"
           git config user.email "deno-rss@example.com"
 
-          date --utc --iso-8601=seconds
-          date --utc --iso-8601=seconds > last_published.txt
-
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git add last_published.txt
-          git commit -m "bot:last_published.txt updated"
+          git add last_published.yaml
+          git commit -m "bot:last_published.yaml updated"
           git push
 
 
