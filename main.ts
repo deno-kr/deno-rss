@@ -16,6 +16,8 @@ const channelId = BigInt(Deno.env.get("CHANNEL_ID") ?? "");
 
 const linksRaw = Deno.env.get("RSS_LINKS") ?? "";
 const lastPublishedFilePath = "./last_published.yaml"
+const lastPublishedFile = await Deno.open(lastPublishedFilePath, { read: true, write: true, create: true })
+lastPublishedFile.close();
 
 const lastPublishedRaw = parse((await Deno.readTextFile(lastPublishedFilePath)).trim() ?? '') as (Record<string, Date> | undefined) ?? {};
 
