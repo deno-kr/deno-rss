@@ -1,10 +1,14 @@
+import "https://deno.land/std@0.153.0/dotenv/load.ts";
 import { parseFeed } from "https://deno.land/x/rss@0.5.3/mod.ts";
 import * as discordeno from "https://deno.land/x/discordeno@13.0.0-rc45/mod.ts";
 import type { Embed } from "https://deno.land/x/discordeno@13.0.0-rc45/transformers/embed.ts";
 import { unescape } from "https://deno.land/x/html_escape@v1.1.5/unescape.ts";
 import textClipper from "https://deno.land/x/text_clipper@2.1.0/mod.ts";
 import { FeedEntry } from "https://deno.land/x/rss@0.5.3/src/types/feed.ts";
-import { parse, stringify } from "https://deno.land/x/yaml@v2.1.1/src/index.ts";
+import {
+  parse,
+  stringify,
+} from "https://deno.land/std@0.153.0/encoding/yaml.ts";
 
 const token = Deno.env.get("BOT_TOKEN") ?? "";
 const botId = BigInt(Deno.env.get("BOT_ID") ?? "");
@@ -13,14 +17,31 @@ const channelId = BigInt(Deno.env.get("CHANNEL_ID") ?? "");
 const linksRaw = Deno.env.get("RSS_LINKS") ?? "";
 const lastPublishedFilePath = "./last_published.yaml"
 
-const lastPublishedRaw: Record<string, Date> = parse((await Deno.readTextFile(lastPublishedFilePath)).trim());
+const lastPublishedRaw = parse((await Deno.readTextFile(lastPublishedFilePath)).trim() ?? '') as (Record<string, Date> | undefined) ?? {};
 
-console.log(`lastPublishedRaw: ${lastPublishedRaw}`);
+const fetchRSS = async (target: string): Promise<FeedEntry[]> => {
+  const response = await fetch(target);
+  const xml = await response.text();
+
+  try {
+    const { entries } = await parseFeed(xml);
+    return entries;
+  } catch (error) {
+    console.error(JSON.stringify({
+      errorMessage: error.message,
+      xml,
+    }));
+    Deno.exit(1);
+  }
+}
+
+console.log(`lastPublishedRaw: ${JSON.stringify(lastPublishedRaw)}`);
 
 const links: string[] = JSON.parse(linksRaw);
-links.map(async (link) => {
+const promises = links.map(async (link) => {
   const entries = await fetchRSS(link);
-  const lastPublishedForLink = lastPublishedRaw[link];
+  const lastPublishedForLink = lastPublishedRaw[link] ?? new Date();
+  console.log(`${link}: ${lastPublishedForLink}`);
 
   const [entriesToPublish, newLastPublished]: [FeedEntry[], Date] = entries
     .filter((it) => 
@@ -57,28 +78,14 @@ links.map(async (link) => {
         embeds,
       }
     );
-
-    lastPublishedRaw[link] = newLastPublished;
   }
+
+  lastPublishedRaw[link] = newLastPublished;
 });
 
-console.log(`lastPublishedRaw: ${lastPublishedRaw}`);
+await Promise.all(promises)
+
+console.log(`newLastPublishedRaw: ${JSON.stringify(lastPublishedRaw)}`);
 
 const content = stringify(lastPublishedRaw);
-await Deno.writeFile(lastPublishedFilePath, content);
-
-const fetchRSS = async (target: string): Promise<FeedEntry[]> => {
-  const response = await fetch(target);
-  const xml = await response.text();
-
-  try {
-    const { entries } = await parseFeed(xml);
-    return entries;
-  } catch (error) {
-    console.error(JSON.stringify({
-      errorMessage: error.message,
-      xml,
-    }));
-    Deno.exit(1);
-  }
-}
+await Deno.writeTextFile(lastPublishedFilePath, content);
