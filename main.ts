@@ -43,7 +43,7 @@ const links: string[] = JSON.parse(linksRaw);
 const promises = links.map(async (link) => {
   const entries = await fetchRSS(link);
   const lastPublishedForLink = lastPublishedRaw[link] ?? new Date();
-  console.log(`${link}: ${lastPublishedForLink}`);
+  console.log(`${link}: ${lastPublishedForLink.toISOString()}`);
 
   const [entriesToPublish, newLastPublished]: [FeedEntry[], Date] = entries
     .filter((it) => 
