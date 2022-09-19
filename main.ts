@@ -11,7 +11,7 @@ const botId = BigInt(Deno.env.get("BOT_ID") ?? "");
 const channelId = BigInt(Deno.env.get("CHANNEL_ID") ?? "");
 
 const link = Deno.env.get("RSS_LINK") ?? "";
-const lastPublishedFilePath = `${link.replaceAll("/", "_")}.json`;
+const lastPublishedFilePath = `lastPublished_${link.replaceAll("/", "_")}.json`;
 const lastPublishedFile = await Deno.open(lastPublishedFilePath, {
   read: true,
   write: true,
@@ -19,9 +19,11 @@ const lastPublishedFile = await Deno.open(lastPublishedFilePath, {
 });
 lastPublishedFile.close();
 
-const lastPublished = (JSON.parse(
-  (await Deno.readTextFile(lastPublishedFilePath)).trim() ?? "",
-) as (Record<string, Date> | undefined) ?? { lastPublished: new Date() }).lastPublished;
+const lastPublished = (
+  JSON.parse(
+    (await Deno.readTextFile(lastPublishedFilePath)).trim() || "{}",
+  ) as (Record<string, Date> | undefined) ?? { lastPublished: new Date() }
+).lastPublished;
 
 const fetchRSS = async (target: string): Promise<FeedEntry[]> => {
   const response = await fetch(target);

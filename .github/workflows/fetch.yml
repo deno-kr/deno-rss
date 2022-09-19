@@ -40,7 +40,7 @@ jobs:
           git config user.email "deno-rss@example.com"
 
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git add *.json
+          git add lastPublished_*.json
           git commit -m "${{ matrix.rss_link }} last_published updated" --allow-empty
           git push
 
