@@ -38,7 +38,7 @@ jobs:
       - name: "[WRAPUP] Sanitize rss_link"
         id: sanitize
         run: |
-          output="$(echo ${{ matrix.rss_link }} | sed \"s/:/_/g\" | sed \"s/\//_/g\")"
+          output=$(echo ${{ matrix.rss_link }} | sed "s/:/_/g" | sed "s/\//_/g")
           echo $output
           echo "::set-output name=artifact-name::$(output)"
       - name: "[WRAPUP] Upload last published time file"
