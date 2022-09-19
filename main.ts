@@ -11,7 +11,7 @@ const botId = BigInt(Deno.env.get("BOT_ID") ?? "");
 const channelId = BigInt(Deno.env.get("CHANNEL_ID") ?? "");
 
 const link = Deno.env.get("RSS_LINK") ?? "";
-const lastPublishedFilePath = `lastPublished_${link.replaceAll("/", "_").replaceAll(":", "_")}.json`;
+const lastPublishedFilePath = `lastPublished/${link.replaceAll("/", "_").replaceAll(":", "_")}.json`;
 const lastPublishedFile = await Deno.open(lastPublishedFilePath, {
   read: true,
   write: true,
