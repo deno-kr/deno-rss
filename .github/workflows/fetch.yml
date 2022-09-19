@@ -44,7 +44,7 @@ jobs:
       - name: "[WRAPUP] Upload last published time file"
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ steps.sanitize.outputs.artifact-name }} 
+          name: lastPublished_${{ steps.sanitize.outputs.artifact-name }}.json
           path: lastPublished_${{ steps.sanitize.outputs.artifact-name }}.json
   publish:
     runs-on: ubuntu-latest
