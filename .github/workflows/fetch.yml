@@ -7,6 +7,9 @@ on:
 jobs:
   fetch:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rss_link: ["https://buttondown.email/denonews/rss", "https://deno.com/feed"]
     steps:
       - name: "[SETUP] Checkout Bot"
         uses: actions/checkout@v3
@@ -28,17 +31,17 @@ jobs:
           BOT_ID: ${{ secrets.BOT_ID }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHANNEL_ID: ${{ secrets.CHANNEL_ID }}
-          RSS_LINKS: '["https://buttondown.email/denonews/rss", "https://deno.com/feed"]'
+          RSS_LINK: ${{ matrix.rss_link }}
         run: |
           deno run -A --unstable https://raw.githubusercontent.com/${{ github.repository }}/dev/main.ts
-      - name: "[WRAPUP] Write Current Time"
+      - name: "[WRAPUP] Write Last Published Time"
         run: |
           git config user.name "Deno RSS Bot"
           git config user.email "deno-rss@example.com"
 
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git add last_published.yaml
-          git commit -m "bot:last_published.yaml updated" --allow-empty
+          git add *.json
+          git commit -m "${{ matrix.rss_link }} last_published updated" --allow-empty
           git push
 
 

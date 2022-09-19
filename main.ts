@@ -5,17 +5,13 @@ import type { Embed } from "https://deno.land/x/discordeno@13.0.0-rc45/transform
 import { unescape } from "https://deno.land/x/html_escape@v1.1.5/unescape.ts";
 import textClipper from "https://deno.land/x/text_clipper@2.1.0/mod.ts";
 import { FeedEntry } from "https://deno.land/x/rss@0.5.3/src/types/feed.ts";
-import {
-  parse,
-  stringify,
-} from "https://deno.land/std@0.153.0/encoding/yaml.ts";
 
 const token = Deno.env.get("BOT_TOKEN") ?? "";
 const botId = BigInt(Deno.env.get("BOT_ID") ?? "");
 const channelId = BigInt(Deno.env.get("CHANNEL_ID") ?? "");
 
-const linksRaw = Deno.env.get("RSS_LINKS") ?? "";
-const lastPublishedFilePath = "./last_published.yaml";
+const link = Deno.env.get("RSS_LINK") ?? "";
+const lastPublishedFilePath = `${link.replaceAll("/", "_")}.json`;
 const lastPublishedFile = await Deno.open(lastPublishedFilePath, {
   read: true,
   write: true,
@@ -23,9 +19,9 @@ const lastPublishedFile = await Deno.open(lastPublishedFilePath, {
 });
 lastPublishedFile.close();
 
-const lastPublishedRaw = parse(
+const lastPublished = (JSON.parse(
   (await Deno.readTextFile(lastPublishedFilePath)).trim() ?? "",
-) as (Record<string, Date> | undefined) ?? {};
+) as (Record<string, Date> | undefined) ?? { lastPublished: new Date() }).lastPublished;
 
 const fetchRSS = async (target: string): Promise<FeedEntry[]> => {
   const response = await fetch(target);
@@ -43,60 +39,51 @@ const fetchRSS = async (target: string): Promise<FeedEntry[]> => {
   }
 };
 
-console.log(`lastPublishedRaw: ${JSON.stringify(lastPublishedRaw)}`);
+console.log(`lastPublishedRaw: ${JSON.stringify(lastPublished)}`);
 
-const links: string[] = JSON.parse(linksRaw);
-const promises = links.map(async (link) => {
-  const entries = await fetchRSS(link);
-  const lastPublishedForLink = lastPublishedRaw[link] ?? new Date();
-  console.log(`${link}: ${lastPublishedForLink.toISOString()}`);
+const entries = await fetchRSS(link);
 
-  const [entriesToPublish, newLastPublished]: [FeedEntry[], Date] = entries
-    .filter((it) =>
-      it.published !== undefined && it.published > lastPublishedForLink
-    )
-    .reduce(
-      (
-        acc,
-        it,
-      ) => [acc[0].concat(it), acc[1] > it.published! ? acc[1] : it.published!],
-      [new Array<FeedEntry>(), lastPublishedForLink],
-    );
+const [entriesToPublish, newLastPublished]: [FeedEntry[], Date] = entries
+  .filter((it) =>
+    it.published !== undefined && it.published > lastPublished
+  )
+  .reduce(
+    (
+      acc,
+      it,
+    ) => [acc[0].concat(it), acc[1] > it.published! ? acc[1] : it.published!],
+    [new Array<FeedEntry>(), lastPublished],
+  );
 
-  console.log(`entriesToPublish: ${entriesToPublish}`);
+console.log(`entriesToPublish: ${entriesToPublish}`);
 
-  const embeds: Embed[] = entriesToPublish
-    .map((it) => ({
-      title: it.title?.value,
-      description: textClipper(
-        unescape(it.description?.value ?? "")
-          .replace(/<[^>]*>/g, ""),
-        100,
-        { html: false, indicator: "..." },
-      ),
-      url: it.links[0].href,
-    }));
+const embeds: Embed[] = entriesToPublish
+  .map((it) => ({
+    title: it.title?.value,
+    description: textClipper(
+      unescape(it.description?.value ?? "")
+        .replace(/<[^>]*>/g, ""),
+      100,
+      { html: false, indicator: "..." },
+    ),
+    url: it.links[0].href,
+  }));
 
-  if (embeds.length > 0) {
-    const bot = discordeno.createBot({
-      token,
-      botId,
-    });
-    discordeno.sendMessage(
-      bot,
-      channelId,
-      {
-        embeds,
-      },
-    );
-  }
+if (embeds.length > 0) {
+  const bot = discordeno.createBot({
+    token,
+    botId,
+  });
+  discordeno.sendMessage(
+    bot,
+    channelId,
+    {
+      embeds,
+    },
+  );
+}
 
-  lastPublishedRaw[link] = newLastPublished;
-});
+console.log(`newLastPublishedRaw: ${JSON.stringify(lastPublished)}`);
 
-await Promise.all(promises);
-
-console.log(`newLastPublishedRaw: ${JSON.stringify(lastPublishedRaw)}`);
-
-const content = stringify(lastPublishedRaw);
+const content = JSON.stringify({ lastPublished: newLastPublished });
 await Deno.writeTextFile(lastPublishedFilePath, content);
