@@ -37,7 +37,10 @@ jobs:
           deno run -A --unstable https://raw.githubusercontent.com/${{ github.repository }}/dev/main.ts
       - name: "[WRAPUP] Sanitize rss_link"
         id: sanitize
-        run: echo "::set-output name=artifact-name::$(echo ${{ matrix.rss_link }} | sed \"s/:/_/g\" | sed \"s/\//_/g\")"
+        run: |
+          output="$(echo ${{ matrix.rss_link }} | sed \"s/:/_/g\" | sed \"s/\//_/g\")"
+          echo $output
+          echo "::set-output name=artifact-name::$(output)"
       - name: "[WRAPUP] Upload last published time file"
         uses: actions/upload-artifact@v3
         with:
