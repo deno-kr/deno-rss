@@ -36,6 +36,7 @@ jobs:
       - name: "[WRAPUP] Upload last published time file"
         uses: actions/upload-artifact@v3
         with:
+          name: ${{ matrix.rss_link }}
           path: lastPublished_*.json
   publish:
     runs-on: ubuntu-latest
