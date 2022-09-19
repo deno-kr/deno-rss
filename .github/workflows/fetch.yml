@@ -44,8 +44,8 @@ jobs:
       - name: "[WRAPUP] Upload last published time file"
         uses: actions/upload-artifact@v3
         with:
-          name: lastPublished_${{ steps.sanitize.outputs.artifact-name }}.json
-          path: lastPublished_${{ steps.sanitize.outputs.artifact-name }}.json
+          name: lastPublished
+          path: ${{ steps.sanitize.outputs.artifact-name }}.json
   publish:
     runs-on: ubuntu-latest
     needs: [fetch]
@@ -64,7 +64,7 @@ jobs:
           git config user.email "deno-rss@example.com"
 
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git add lastPublished_*.json
+          git add lastPublished/*.json
           git commit -m "last_published updated" --allow-empty
           git push
 
