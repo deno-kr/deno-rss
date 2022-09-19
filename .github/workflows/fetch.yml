@@ -59,7 +59,7 @@ jobs:
       - name: "[DOWNLOAD] Download last published time files"
         uses: actions/download-artifact@v3
       - name: "[LOG] Show list"
-        run: ls -al
+        run: ls -alR
       - name: "[WRAPUP] Write Last Published Time"
         run: |
           git config user.name "Deno RSS Bot"
