@@ -54,7 +54,7 @@ jobs:
 
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git add lastPublished_*.json
-          git commit -m "${{ matrix.rss_link }} last_published updated" --allow-empty
+          git commit -m "last_published updated" --allow-empty
           git push
 
 
