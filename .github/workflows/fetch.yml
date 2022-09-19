@@ -60,6 +60,8 @@ jobs:
         uses: actions/download-artifact@v3
       - name: "[LOG] Show list"
         run: ls -alR
+      - name: "[LOG] Show diff"
+        run: git diff
       - name: "[WRAPUP] Write Last Published Time"
         run: |
           git config user.name "Deno RSS Bot"
