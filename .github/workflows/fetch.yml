@@ -40,7 +40,7 @@ jobs:
         run: |
           output=$(echo ${{ matrix.rss_link }} | sed "s/:/_/g" | sed "s/\//_/g")
           echo $output
-          echo "::set-output name=artifact-name::$(output)"
+          echo "::set-output name=artifact-name::$output"
       - name: "[WRAPUP] Upload last published time file"
         uses: actions/upload-artifact@v3
         with:
