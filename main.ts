@@ -19,11 +19,8 @@ const lastPublishedFile = await Deno.open(lastPublishedFilePath, {
 });
 lastPublishedFile.close();
 
-const lastPublished = (
-  JSON.parse(
-    (await Deno.readTextFile(lastPublishedFilePath)).trim() || "{}",
-  ) as (Record<string, Date> | undefined) ?? { lastPublished: new Date() }
-).lastPublished;
+const lastPublishedRaw = (await Deno.readTextFile(lastPublishedFilePath)).trim() || "{}"
+const lastPublished = (JSON.parse(lastPublishedRaw)).lastPublished ?? new Date();
 
 const fetchRSS = async (target: string): Promise<FeedEntry[]> => {
   const response = await fetch(target);
